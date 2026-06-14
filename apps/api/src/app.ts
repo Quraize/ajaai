@@ -51,7 +51,7 @@ function createAuthLimiter(prefix: string) {
       if (req.body?.email) {
         return String(req.body.email).toLowerCase();
       }
-      return ipKeyGenerator(req);
+      return ipKeyGenerator(req.ip || "unknown");
     },
     message: { error: "Too many attempts. Please try again later." },
   });
