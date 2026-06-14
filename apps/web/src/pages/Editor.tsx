@@ -22,6 +22,8 @@ export default function Editor() {
   const [debouncedContent] = useDebounce(content, 1000);
   const [debouncedTitle] = useDebounce(title, 1000);
   const isInitialMount = useRef(true);
+  const docRef = useRef(doc);
+  docRef.current = doc;
 
   const fetchDoc = useCallback(async () => {
     if (!id) return;
@@ -47,8 +49,9 @@ export default function Editor() {
       isInitialMount.current = false;
       return;
     }
-    if (!id || !doc) return;
-    if (debouncedTitle === doc.title && debouncedContent === doc.content) return;
+    const currentDoc = docRef.current;
+    if (!id || !currentDoc) return;
+    if (debouncedTitle === currentDoc.title && debouncedContent === currentDoc.content) return;
 
     const save = async () => {
       setSaving(true);
@@ -66,7 +69,7 @@ export default function Editor() {
     };
 
     save();
-  }, [debouncedContent, debouncedTitle, id, doc]);
+  }, [debouncedContent, debouncedTitle, id]);
 
   const handleDelete = async () => {
     if (!id || !window.confirm("Delete this document?")) return;
