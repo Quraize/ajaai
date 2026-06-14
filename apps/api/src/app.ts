@@ -25,14 +25,17 @@ app.use(express.json({ limit: "10mb" }));
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 10,
   standardHeaders: true,
   legacyHeaders: false,
+  skipSuccessfulRequests: true,
   message: { error: "Too many attempts. Please try again later." },
 });
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
-app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 
 const webDist = path.resolve(__dirname, "../../web/dist");

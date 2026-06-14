@@ -144,6 +144,24 @@ Then get SSL with Certbot:
 sudo certbot --nginx -d your-domain.com
 ```
 
+### Docker + PostgreSQL (production-grade)
+
+For a persistent, production-grade database, use `docker-compose.postgres.yml`. It runs a Postgres container alongside the app.
+
+1. **Start the stack**
+   ```bash
+   export JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+   docker compose -f docker-compose.postgres.yml up --build -d
+   ```
+
+2. **Seed demo users (one-time)**
+   ```bash
+   docker compose -f docker-compose.postgres.yml exec ajaai pnpm prisma db seed
+   ```
+
+3. **Open the app**
+   - http://your-vps-ip:4000
+
 ### Render (alternative) — single service
 
 1. Push this repo to GitHub.

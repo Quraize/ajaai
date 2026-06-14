@@ -2,6 +2,7 @@
 
 # ---------- Build stage ----------
 FROM node:20-slim AS builder
+ARG DATABASE_PROVIDER=sqlite
 
 RUN apt-get update -y && apt-get install -y openssl curl && rm -rf /var/lib/apt/lists/*
 
@@ -20,6 +21,12 @@ RUN pnpm install --frozen-lockfile
 COPY apps/api ./apps/api
 COPY apps/web ./apps/web
 
+RUN if [ "$DATABASE_PROVIDER" = "postgres" ]; then \
+      cp apps/api/prisma/schema.postgres.prisma apps/api/prisma/schema.prisma && \
+      rm -rf apps/api/prisma/migrations && \
+      mv apps/api/prisma/migrations_postgres apps/api/prisma/migrations; \
+    fi
+
 RUN pnpm --filter api db:generate
 RUN pnpm build
 
@@ -37,7 +44,6 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
-COPY apps/api/prisma ./apps/api/prisma
 
 RUN pnpm install --frozen-lockfile
 
@@ -45,6 +51,7 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/src/generated ./apps/api/src/generated
 COPY --from=builder /app/apps/api/src/generated ./apps/api/dist/generated
 COPY --from=builder /app/apps/web/dist ./apps/web/dist
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 
 WORKDIR /app/apps/api
 CMD ["sh", "-c", "pnpm prisma migrate deploy && node dist/index.js"]
