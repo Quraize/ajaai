@@ -69,6 +69,7 @@ DATABASE_URL="file:./dev.db"
 JWT_SECRET="your-secret-key"
 PORT=4000
 NODE_ENV=development
+CLIENT_ORIGIN="*"              # lock to your domain in production, e.g. http://your-domain.com
 ```
 
 For the frontend, set `VITE_API_URL` when deploying to production; locally Vite proxies `/api` to the backend.
@@ -104,7 +105,14 @@ A `Dockerfile` and `docker-compose.yml` are included. This keeps your host serve
 5. **Open the app**
    - http://your-vps-ip:4000
 
-6. **Useful commands**
+6. **Redeploy after an update**
+   ```bash
+   git pull
+   docker compose down
+   docker compose up --build -d
+   ```
+
+7. **Useful commands**
    ```bash
    docker compose logs -f ajaai   # view logs
    docker compose down            # stop
