@@ -8,10 +8,17 @@ services:
       - NODE_ENV=production
       - PORT=4000
       - DATABASE_URL=file:./prisma/prod.db
-      - JWT_SECRET=${JWT_SECRET:-ajaai-demo-secret-change-in-production}
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}
+      - CLIENT_ORIGIN=${CLIENT_ORIGIN:-}
     volumes:
       - ajaai-data:/app/apps/api/prisma
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 volumes:
   ajaai-data:
