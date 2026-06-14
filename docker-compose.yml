@@ -1,4 +1,16 @@
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: ajaai-redis
+    volumes:
+      - ajaai-redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   ajaai:
     build: .
     container_name: ajaai
@@ -10,8 +22,12 @@ services:
       - DATABASE_URL=file:./prisma/prod.db
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}
       - CLIENT_ORIGIN=${CLIENT_ORIGIN:-}
+      - REDIS_URL=redis://redis:6379
     volumes:
       - ajaai-data:/app/apps/api/prisma
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:4000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
@@ -22,3 +38,4 @@ services:
 
 volumes:
   ajaai-data:
+  ajaai-redis-data:

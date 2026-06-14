@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
+import { RedisStore } from "rate-limit-redis";
+import { createClient } from "redis";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -23,18 +25,41 @@ if (isProduction && clientOrigin) {
 
 app.use(express.json({ limit: "10mb" }));
 
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: true,
-  message: { error: "Too many attempts. Please try again later." },
-});
+function createRedisStore(prefix: string) {
+  const url = process.env.REDIS_URL;
+  if (!url) return undefined;
+
+  const client = createClient({ url });
+  client.on("error", (err) => console.error("Redis client error:", err));
+  client.connect().catch((err) => console.error("Redis connection failed:", err));
+
+  return new RedisStore({
+    prefix,
+    sendCommand: (...args: string[]) => client.sendCommand(args),
+  });
+}
+
+function createAuthLimiter(prefix: string) {
+  return rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    store: createRedisStore(prefix),
+    keyGenerator: (req: express.Request) => {
+      if (req.body?.email) {
+        return String(req.body.email).toLowerCase();
+      }
+      return ipKeyGenerator(req);
+    },
+    message: { error: "Too many attempts. Please try again later." },
+  });
+}
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
-app.use("/api/auth/login", authLimiter);
-app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/login", createAuthLimiter("rl:login"));
+app.use("/api/auth/register", createAuthLimiter("rl:register"));
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
 

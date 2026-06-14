@@ -70,6 +70,7 @@ JWT_SECRET="your-secret-key"
 PORT=4000
 NODE_ENV=development
 CLIENT_ORIGIN="*"              # lock to your domain in production, e.g. http://your-domain.com
+REDIS_URL=                     # optional; enables Redis-backed rate-limit counters
 ```
 
 For the frontend, set `VITE_API_URL` when deploying to production; locally Vite proxies `/api` to the backend.
@@ -78,7 +79,7 @@ For the frontend, set `VITE_API_URL` when deploying to production; locally Vite 
 
 ### Docker (recommended for VPS)
 
-A `Dockerfile` and `docker-compose.yml` are included. This keeps your host server clean and persists the SQLite database in a Docker volume.
+A `Dockerfile` and `docker-compose.yml` are included. This keeps your host server clean, persists the SQLite database in a Docker volume, and runs a Redis container for shared rate-limit counters.
 
 1. **Clone and enter the repo**
    ```bash

@@ -15,6 +15,18 @@ services:
       retries: 5
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: ajaai-redis
+    volumes:
+      - ajaai-redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   ajaai:
     build:
       context: .
@@ -29,8 +41,11 @@ services:
       - DATABASE_URL=postgresql://ajaai:ajaai@db:5432/ajaai?schema=public
       - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}
       - CLIENT_ORIGIN=${CLIENT_ORIGIN:-}
+      - REDIS_URL=redis://redis:6379
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:4000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
@@ -42,3 +57,4 @@ services:
 
 volumes:
   ajaai-postgres-data:
+  ajaai-redis-data:
