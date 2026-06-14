@@ -38,10 +38,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=4000
-      - DATABASE_URL=postgresql://ajaai:ajaai@db:5432/ajaai?schema=public
-      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}
+      - 'DATABASE_URL=postgresql://ajaai:ajaai@db:5432/ajaai?schema=public'
+      - 'JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}'
       - CLIENT_ORIGIN=${CLIENT_ORIGIN:-}
-      - REDIS_URL=redis://redis:6379
+      - 'REDIS_URL=redis://redis:6379'
     depends_on:
       db:
         condition: service_healthy

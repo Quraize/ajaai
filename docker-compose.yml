@@ -20,9 +20,9 @@ services:
       - NODE_ENV=production
       - PORT=4000
       - DATABASE_URL=file:./prisma/prod.db
-      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}
+      - 'JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required. Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"}'
       - CLIENT_ORIGIN=${CLIENT_ORIGIN:-}
-      - REDIS_URL=redis://redis:6379
+      - 'REDIS_URL=redis://redis:6379'
     volumes:
       - ajaai-data:/app/apps/api/prisma
     depends_on:
