@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@prisma/client':
-        specifier: 5.22.0
-        version: 5.22.0(prisma@5.22.0)
       typescript:
         specifier: ^5.4.5
         version: 5.9.3
@@ -18,7 +15,7 @@ importers:
   apps/api:
     dependencies:
       '@prisma/client':
-        specifier: ^5.13.0
+        specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
       bcryptjs:
         specifier: ^2.4.3

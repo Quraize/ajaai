@@ -13,7 +13,6 @@
     "db:deploy": "pnpm --filter api db:deploy"
   },
   "devDependencies": {
-    "@prisma/client": "5.22.0",
     "typescript": "^5.4.5"
   }
 }

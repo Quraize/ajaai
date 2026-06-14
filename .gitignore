@@ -18,6 +18,9 @@ dist-ssr
 *.db
 *.db-journal
 
+# Generated code
+apps/api/src/generated
+
 # Testing
 coverage
 
