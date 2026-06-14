@@ -42,6 +42,7 @@ COPY apps/api/prisma ./apps/api/prisma
 RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/src/generated ./apps/api/src/generated
 COPY --from=builder /app/apps/api/src/generated ./apps/api/dist/generated
 COPY --from=builder /app/apps/web/dist ./apps/web/dist
 
