@@ -1,0 +1,19 @@
+{
+  "name": "ajaia-docs",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "db:seed": "pnpm --filter api db:seed",
+    "db:deploy": "pnpm --filter api db:deploy"
+  },
+  "devDependencies": {
+    "@prisma/client": "5.22.0",
+    "typescript": "^5.4.5"
+  }
+}
