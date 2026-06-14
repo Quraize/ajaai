@@ -15,9 +15,9 @@
 
 ## Live Deployment
 
-> A live Render deployment was prepared but not published because the GitHub repository could not be created from this environment. The project is ready to deploy as a single Render Web Service using the instructions in `README.md`.
+> A live deployment was prepared but not published from this environment. The project is ready to deploy via **Docker** on a VPS or as a single **Render Web Service** using the instructions in `README.md`.
 
-- **Frontend / API**: *TBD — deploy via Render using README instructions*
+- **Frontend / API**: *TBD — deploy via Docker or Render using README instructions*
 
 ## Local Demo
 

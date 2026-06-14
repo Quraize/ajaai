@@ -75,7 +75,68 @@ For the frontend, set `VITE_API_URL` when deploying to production; locally Vite 
 
 ## Deployment
 
-### Render (recommended) — single service
+### Docker (recommended for VPS)
+
+A `Dockerfile` and `docker-compose.yml` are included. This keeps your host server clean and persists the SQLite database in a Docker volume.
+
+1. **Clone and enter the repo**
+   ```bash
+   git clone https://github.com/Quraize/ajaai.git
+   cd ajaai
+   ```
+
+2. **Create a strong JWT secret**
+   ```bash
+   export JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+   echo $JWT_SECRET
+   ```
+
+3. **Build and start**
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. **Seed demo users (one-time)**
+   ```bash
+   docker compose exec ajaai pnpm prisma db seed
+   ```
+
+5. **Open the app**
+   - http://your-vps-ip:4000
+
+6. **Useful commands**
+   ```bash
+   docker compose logs -f ajaai   # view logs
+   docker compose down            # stop
+   docker compose up -d           # start
+   ```
+
+### Nginx + SSL (optional)
+
+If you have a domain, put Nginx in front of Docker:
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+
+    location / {
+        proxy_pass http://localhost:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+Then get SSL with Certbot:
+```bash
+sudo certbot --nginx -d your-domain.com
+```
+
+### Render (alternative) — single service
 
 1. Push this repo to GitHub.
 2. Create a **Web Service**:
