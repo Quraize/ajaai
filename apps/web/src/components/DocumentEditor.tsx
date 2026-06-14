@@ -50,7 +50,10 @@ export default function DocumentEditor({ content, editable = true, onChange }: D
   }) => (
     <button
       type="button"
-      onClick={onClick}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
       title={title}
       disabled={!editable}
       className={cn(

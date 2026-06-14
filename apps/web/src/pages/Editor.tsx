@@ -19,8 +19,7 @@ export default function Editor() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
-  const [debouncedContent] = useDebounce(content, 1000);
-  const [debouncedTitle] = useDebounce(title, 1000);
+  const [debouncedDoc] = useDebounce({ title, content }, 1000);
   const isInitialMount = useRef(true);
   const docRef = useRef(doc);
   docRef.current = doc;
@@ -51,13 +50,14 @@ export default function Editor() {
     }
     const currentDoc = docRef.current;
     if (!id || !currentDoc) return;
-    if (debouncedTitle === currentDoc.title && debouncedContent === currentDoc.content) return;
+    if (debouncedDoc.title === currentDoc.title && debouncedDoc.content === currentDoc.content) return;
+    if (!debouncedDoc.title) return;
 
     const save = async () => {
       setSaving(true);
       setSaveStatus("Saving…");
       try {
-        const res = await api.patch(`/documents/${id}`, { title: debouncedTitle, content: debouncedContent });
+        const res = await api.patch(`/documents/${id}`, { title: debouncedDoc.title, content: debouncedDoc.content });
         setDoc(res.data);
         setSaveStatus("Saved");
         setTimeout(() => setSaveStatus(""), 2000);
@@ -69,7 +69,7 @@ export default function Editor() {
     };
 
     save();
-  }, [debouncedContent, debouncedTitle, id]);
+  }, [debouncedDoc, id]);
 
   const handleDelete = async () => {
     if (!id || !window.confirm("Delete this document?")) return;
