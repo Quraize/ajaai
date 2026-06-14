@@ -3,6 +3,8 @@
 # ---------- Build stage ----------
 FROM node:20-slim AS builder
 
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
@@ -23,6 +25,8 @@ RUN pnpm build
 
 # ---------- Production stage ----------
 FROM node:20-slim AS runner
+
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
