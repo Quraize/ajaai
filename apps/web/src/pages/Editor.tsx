@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { Document } from "@/types";
 import DocumentEditor from "@/components/DocumentEditor";
 import ShareDialog from "@/components/ShareDialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 import { ArrowLeft, Share2, Trash2, Check, Loader2 } from "lucide-react";
 
 export default function Editor() {
@@ -19,6 +20,7 @@ export default function Editor() {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [debouncedDoc] = useDebounce({ title, content }, 1000);
   const isInitialMount = useRef(true);
   const docRef = useRef(doc);
@@ -72,7 +74,7 @@ export default function Editor() {
   }, [debouncedDoc, id]);
 
   const handleDelete = async () => {
-    if (!id || !window.confirm("Delete this document?")) return;
+    if (!id) return;
     await api.delete(`/documents/${id}`);
     navigate("/documents");
   };
@@ -120,7 +122,7 @@ export default function Editor() {
             )}
             {isOwner && (
               <button
-                onClick={handleDelete}
+                onClick={() => setDeleteOpen(true)}
                 aria-label="Delete document"
                 className="rounded-md border px-3 py-1.5 text-sm font-medium text-destructive hover:bg-destructive/10"
               >
@@ -141,6 +143,17 @@ export default function Editor() {
       </main>
 
       <ShareDialog document={doc} open={shareOpen} onClose={() => setShareOpen(false)} onUpdate={fetchDoc} />
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title="Delete document"
+        message="Are you sure you want to delete this document? This action cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteOpen(false)}
+      />
     </div>
   );
 }
